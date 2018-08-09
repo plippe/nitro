@@ -10,7 +10,7 @@ trait Grid[F[_]] {
   def distance(value: UInt): F[UInt]
 }
 
-class OddSpiralGrid[F[_]](n: UInt)(implicit F: ApplicativeError[F, GridError])
+class OddSpiralGrid[F[_]](n: UInt)(implicit F: ApplicativeError[F, Throwable])
     extends Grid[F] {
 
   def maxCornerValue(squareIndex: Int): Int =
@@ -45,7 +45,7 @@ class OddSpiralGrid[F[_]](n: UInt)(implicit F: ApplicativeError[F, GridError])
 object OddSpiralGrid {
   val maxSize = Int.MaxValue
 
-  def apply[F[_]]()(implicit F: ApplicativeError[F, GridError]) = {
+  def apply[F[_]]()(implicit F: ApplicativeError[F, Throwable]) = {
     val n = UInt.fromIntUnsafe(maxSize)
     new OddSpiralGrid[F](n)
   }

@@ -11,7 +11,7 @@ class UIntSpec extends org.specs2.mutable.Specification {
     "fromIntUnsafe fails with negative" >> { fromIntUnsafeNegative() }
   }
 
-  type F[T] = Either[UIntError, T]
+  type F[T] = Either[Throwable, T]
 
   def fromInt() = {
     UInt.fromInt[F](1) must beRight(UInt(1))

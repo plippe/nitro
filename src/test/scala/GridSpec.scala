@@ -18,7 +18,7 @@ class GridSpec extends org.specs2.mutable.Specification {
     "distance not on grid" >> { distanceNotOnGrid() }
   }
 
-  type F[T] = Either[GridError, T]
+  type F[T] = Either[Throwable, T]
 
   def maxCornerValue() = {
     val grid = OddSpiralGrid()

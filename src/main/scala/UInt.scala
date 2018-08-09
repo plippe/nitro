@@ -11,7 +11,7 @@ case class UInt(value: Int) {
 
 object UInt {
   def fromInt[F[_]](value: Int)(
-      implicit F: ApplicativeError[F, UIntError]): F[UInt] = {
+      implicit F: ApplicativeError[F, Throwable]): F[UInt] = {
     if (value < 0) F.raiseError(UIntNegativeValueError)
     else F.pure(UInt(value))
   }

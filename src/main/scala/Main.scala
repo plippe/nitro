@@ -1,30 +1,37 @@
 package com.github.plippe.nitro
 
-object Main extends App {
+import cats.implicits.{catsStdInstancesForTry => _, _}
+import cats.MonadError
+import scala.util.Try
 
-  def sqrt(i: Int): Int = math.pow(i.toDouble, 2).toInt
+object Main {
 
-  def distance(l: Int): Option[Int] = {
-    Range(1, Int.MaxValue, 2)
-      .find(n => sqrt(n) >= l)
-      .map { n =>
-        val nn = sqrt(n)
+  case object NoSuchLocationArgument
+      extends Throwable("Location argument required")
+  case object TypeConstraintLocationArgument
+      extends Throwable("Location must be a positive integer")
 
-        val stepsFromCorner = n - 1
-        val stepsToCorner = 0
-          .to(4)
-          .map(i => nn - (n - 1) * i)
-          .map(c => math.abs(c - l))
-          .min
+  def parseInt(str: String): Option[Int] = Try(str.toInt).toOption
 
-        stepsFromCorner - stepsToCorner
-      }
+  def run[F[_]](grid: Grid[F], args: Array[String])(
+      implicit F: MonadError[F, Throwable]): F[(Int, Int)] = {
+    for {
+      location <- args.headOption
+        .fold(F.raiseError[String](NoSuchLocationArgument))(_.pure[F])
+      intLocation <- parseInt(location)
+        .fold(F.raiseError[Int](TypeConstraintLocationArgument))(_.pure[F])
+      uIntLocation <- UInt.fromInt[F](intLocation)
+      distance <- grid.distance(uIntLocation)
+    } yield (intLocation, distance.value)
   }
 
-  assert(distance(1) == Some(0))
-  assert(distance(12) == Some(3))
-  assert(distance(23) == Some(2))
-  assert(distance(1024) == Some(31))
+  def main(args: Array[String]): Unit = {
+    type F[T] = Either[Throwable, T]
 
-  println("Hello World")
+    run[F](OddSpiralGrid[F](), args) match {
+      case Right((location, distance)) =>
+        println(s"From location $location the distance is $distance.")
+      case Left(err) => println(s"Error: $err")
+    }
+  }
 }
