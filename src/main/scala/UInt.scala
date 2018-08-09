@@ -15,4 +15,6 @@ object UInt {
     if (value < 0) F.raiseError(UIntNegativeValueError)
     else F.pure(UInt(value))
   }
+
+  def fromIntUnsafe(value: Int) = UInt(value)
 }
